@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FoodScript : MonoBehaviour, Killable
+public class FoodScript : MonoBehaviour
 {
     void Start()
     {
@@ -14,9 +14,9 @@ public class FoodScript : MonoBehaviour, Killable
         
     }
 
-    public bool IsEnemy()
-    {
+    //public bool IsEnemy()
+    //{
         
-    }
+    //}
 
 }

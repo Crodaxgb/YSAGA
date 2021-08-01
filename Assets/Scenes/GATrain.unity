@@ -338,14 +338,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiPrefab: {fileID: 2189660392474024145, guid: 94c2098e504967144a203555303e826d, type: 3}
   foodPrefab: {fileID: 1400098214406659450, guid: 33064b08c3a9857479a7c09c24435418, type: 3}
-  gaStatistics: {fileID: 1576396583}
-  speedUpButton: {fileID: 720600617}
-  epochTime: 20
-  foodCheckPeriod: 5
   aiCount: 30
   foodCount: 200
-  crossOverRatio: 0.4
-  mutationRatio: 0.1
 --- !u!4 &594706851
 Transform:
   m_ObjectHideFlags: 0

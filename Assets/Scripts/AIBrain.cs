@@ -24,10 +24,10 @@ public class AIBrain : MonoBehaviour
     }
 
 
-    List<float> CreateInput()
-    {
+    //List<float> CreateInput()
+    //{
         
-    }
+    //}
 
 
     public void RestoreComponents()
@@ -61,21 +61,21 @@ public class NeuralNetwork
 
     }
 
-    public List<float> GetWeights()
-    {
+    //public List<float> GetWeights()
+    //{
 
-    }
+    //}
 
     public void PutWeights(List<float> flattenedWeights)
     {
         
     }
 
-    public List<float> CalculateOutput(List<float> inputs)
-    {
+    //public List<float> CalculateOutput(List<float> inputs)
+    //{
         
 
-    }
+    //}
 
     float Sigmoid(float netInput, float response = 1.0f)
     {

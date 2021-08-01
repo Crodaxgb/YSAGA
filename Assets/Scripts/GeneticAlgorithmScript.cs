@@ -14,10 +14,10 @@ public class GeneticAlgorithm
     {
 
     }
-    List<float> GetChromoRoulettte()
-    {        
+    //List<float> GetChromoRoulettte()
+    //{        
         
-    }
+    //}
 
     void CrossOver(ref List<float> mum, ref List<float> dad, ref List<float> baby1, ref List<float> baby2)
     {
@@ -25,11 +25,11 @@ public class GeneticAlgorithm
     }
 
 
-    public List<(List<float> weightList, float genomeFitness)> Epoch(ref List<(List<float> weightList, float genomeFitness)> oldPopulation)
-    {
+    //public List<(List<float> weightList, float genomeFitness)> Epoch(ref List<(List<float> weightList, float genomeFitness)> oldPopulation)
+    //{
 
 
-    }
+    //}
 
     //Elitisim için en iyi bireyin bulunmasý
     void GrabNBest(int nBest, int numberOfCopies, ref List<(List<float> weightList, float genomeFitness)> populationReference)
@@ -43,13 +43,13 @@ public class GeneticAlgorithm
 
     }
 
-    void Reset()
-    {
-        totalFitness = 0;
-        bestFitness = 0;
-        worstFitness = 9999999;
-        averageFitness = 0;
-    }
+    //void Reset()
+    //{
+    //    totalFitness = 0;
+    //    bestFitness = 0;
+    //    worstFitness = 9999999;
+    //    averageFitness = 0;
+    //}
   
 
 }
