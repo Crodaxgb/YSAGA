@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class FoodScript : MonoBehaviour
 {
+    GameManager gmRef;
+
+
     void Start()
     {
         
@@ -18,5 +21,7 @@ public class FoodScript : MonoBehaviour
     //{
         
     //}
+
+    public GameManager GmRef { get => gmRef; set => gmRef = value; }
 
 }

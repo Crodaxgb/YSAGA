@@ -6,7 +6,8 @@ using System;
 
 public class AIBrain : MonoBehaviour
 {
-    
+    GameManager gmRef;   
+
     void Awake()
     {
         
@@ -51,6 +52,7 @@ public class AIBrain : MonoBehaviour
         return true;
     }
 
+    public GameManager GmRef { get => gmRef; set => gmRef = value; }
 }
 
 public class NeuralNetwork
