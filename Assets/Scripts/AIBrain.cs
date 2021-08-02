@@ -57,9 +57,32 @@ public class AIBrain : MonoBehaviour
 
 public class NeuralNetwork
 {
+    private List<float[,]> weights = new List<float[,]>();
+    int[] neuralLayers;
+    int neuralWeightLength = 0;
+    //new int[] {3, 6, 3, 1};
     public void InitializeNetwork(int[] layers)
     {
-        
+        neuralLayers = layers;
+        for (int layerIndex = 0; layerIndex < layers.Length - 1; layerIndex++)
+        {
+            var layerWeights = new float[layers[layerIndex + 1] , layers[layerIndex] + 1];
+
+            for (int rowIndex = 0; rowIndex < layers[layerIndex + 1]; rowIndex++)
+            {
+                for (int columnIndex = 0; columnIndex < layers[layerIndex] + 1; columnIndex++)
+                {
+                    layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(0f, 1f);
+                    neuralWeightLength++;
+                }
+
+            }
+
+            weights.Add(layerWeights);
+
+        }
+
+
 
     }
 
