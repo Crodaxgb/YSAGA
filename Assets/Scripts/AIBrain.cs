@@ -59,7 +59,8 @@ public class NeuralNetwork
 {
     private List<float[,]> weights = new List<float[,]>();
     int[] neuralLayers;
-    int neuralWeightLength = 0;
+    int neuralWeightLength = 0;    
+
     //new int[] {3, 6, 3, 1};
     public void InitializeNetwork(int[] layers)
     {
@@ -73,7 +74,7 @@ public class NeuralNetwork
                 for (int columnIndex = 0; columnIndex < layers[layerIndex] + 1; columnIndex++)
                 {
                     layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(0f, 1f);
-                    neuralWeightLength++;
+                    NeuralWeightLength++;
                 }
 
             }
@@ -81,19 +82,45 @@ public class NeuralNetwork
             weights.Add(layerWeights);
 
         }
+    }
 
+    public List<float> GetWeights()
+    {
+        List<float> flattenedWeight = new List<float>();
 
+        for (int layerIndex = 0; layerIndex < neuralLayers.Length - 1; layerIndex++)
+        {
+          
+            for (int rowIndex = 0; rowIndex < neuralLayers[layerIndex + 1]; rowIndex++)
+            {
+                for (int columnIndex = 0; columnIndex < neuralLayers[layerIndex] + 1; columnIndex++)
+                {
+                    flattenedWeight.Add(weights.ElementAt(layerIndex)[rowIndex, columnIndex]);
+                }
+
+            }
+
+        }
+
+        return flattenedWeight;
 
     }
 
-    //public List<float> GetWeights()
-    //{
-
-    //}
-
     public void PutWeights(List<float> flattenedWeights)
     {
-        
+        int flattenIndex = 0;
+        for (int layerIndex = 0; layerIndex < neuralLayers.Length - 1; layerIndex++)
+        {
+
+            for (int rowIndex = 0; rowIndex < neuralLayers[layerIndex + 1]; rowIndex++)
+            {
+                for (int columnIndex = 0; columnIndex < neuralLayers[layerIndex] + 1; columnIndex++)
+                {
+                    weights.ElementAt(layerIndex)[rowIndex, columnIndex] = flattenedWeights[flattenIndex++];                    
+                }
+            }
+        }
+
     }
 
     //public List<float> CalculateOutput(List<float> inputs)
@@ -107,5 +134,5 @@ public class NeuralNetwork
         return (1.0f / (1.0f + (float)System.Math.Exp(-netInput / response)));
     }
 
-   
+    public int NeuralWeightLength { get => neuralWeightLength; set => neuralWeightLength = value; }
 }
