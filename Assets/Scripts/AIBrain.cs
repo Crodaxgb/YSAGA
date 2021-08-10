@@ -6,17 +6,21 @@ using System;
 
 public class AIBrain : MonoBehaviour
 {
-    GameManager gmRef;   
-
+    GameManager gmRef;
+    NeuralNetwork neuralNetwork;
+    Rigidbody2D rigidBodyRef;
     void Awake()
     {
-        
-
+        neuralNetwork = new NeuralNetwork();
+        neuralNetwork.InitializeNetwork(new int[] { 4, 6, 8, 2});
+        rigidBodyRef = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
-    {        
+    {
+        var reaction = neuralNetwork.CalculateOutput(new List<float>() { 0.75f, 0.9f, 0.4f, 0.05f });
+        rigidBodyRef.velocity = new Vector2(reaction.ElementAt(0), reaction.ElementAt(1));       
 
     }
 
@@ -123,11 +127,31 @@ public class NeuralNetwork
 
     }
 
-    //public List<float> CalculateOutput(List<float> inputs)
-    //{
-        
+    public List<float> CalculateOutput(List<float> inputs)
+    {
+        List<float> outputs = new List<float>();
+        for (int layerIndex = 0; layerIndex < neuralLayers.Length - 1; layerIndex++)
+        {
 
-    //}
+            for (int rowIndex = 0; rowIndex < neuralLayers[layerIndex + 1]; rowIndex++)
+            {
+                float weightedSum = 0;
+
+                for (int columnIndex = 0; columnIndex < neuralLayers[layerIndex]; columnIndex++)
+                {
+                    weightedSum += weights.ElementAt(layerIndex)[rowIndex, columnIndex] * inputs.ElementAt(columnIndex); 
+                }
+                //bias
+                weightedSum -= weights.ElementAt(layerIndex)[rowIndex, neuralLayers[layerIndex]];
+                outputs.Add(Sigmoid(weightedSum));
+            }
+
+            inputs = outputs;
+
+        }
+
+        return outputs;
+    }
 
     float Sigmoid(float netInput, float response = 1.0f)
     {
