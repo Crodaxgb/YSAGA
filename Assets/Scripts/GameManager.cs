@@ -12,9 +12,12 @@ public class GameManager : MonoBehaviour
     private (float xRange, float yRange) mapData = (23f, 10f);
 
     private List<Transform> transformList;
+
+    
+
     void Awake()
     {
-        transformList = new List<Transform>();
+        TransformList = new List<Transform>();
         InstantiateSceneObjects();    
        
     }
@@ -32,14 +35,14 @@ public class GameManager : MonoBehaviour
         for (int aiIndex = 0; aiIndex < aiCount; aiIndex++)
         {            
             GameObject aiRef = InstantiateParameter(aiPrefab);
-            transformList.Add(aiRef.transform);
+            TransformList.Add(aiRef.transform);
             aiRef.GetComponent<AIBrain>().GmRef = this;
         }
 
         for (int foodIndex = 0; foodIndex < foodCount; foodIndex++)
         {
             GameObject foodRef = InstantiateParameter(foodPrefab);
-            transformList.Add(foodRef.transform);
+            TransformList.Add(foodRef.transform);
             foodRef.GetComponent<FoodScript>().GmRef = this;
         }
     }
@@ -98,4 +101,5 @@ public class GameManager : MonoBehaviour
         
     }
 
+    public List<Transform> TransformList { get => transformList; set => transformList = value; }
 }

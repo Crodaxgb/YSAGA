@@ -6,21 +6,30 @@ using System;
 
 public class AIBrain : MonoBehaviour
 {
+    List<float> inputList;
+
     GameManager gmRef;
     NeuralNetwork neuralNetwork;
     Rigidbody2D rigidBodyRef;
+    Transform closestObject = null;
+
     void Awake()
     {
+        inputList = new List<float>();
         neuralNetwork = new NeuralNetwork();
-        neuralNetwork.InitializeNetwork(new int[] { 4, 6, 8, 2});
+        neuralNetwork.InitializeNetwork(new int[] { 2, 6, 2});
         rigidBodyRef = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        var reaction = neuralNetwork.CalculateOutput(new List<float>() { 0.75f, 0.9f, 0.4f, 0.05f });
-        rigidBodyRef.velocity = new Vector2(reaction.ElementAt(0), reaction.ElementAt(1));       
+
+        var networkResponse = neuralNetwork.CalculateOutput(CreateInput());
+        rigidBodyRef.velocity = new Vector2(networkResponse.ElementAt(0), 
+            networkResponse.ElementAt(1));
+
+        Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
 
     }
 
@@ -29,19 +38,47 @@ public class AIBrain : MonoBehaviour
     }
 
 
-    //List<float> CreateInput()
-    //{
+    List<float> CreateInput()
+    {
+        inputList.Clear();
+        GetClosestEnemy(GmRef.TransformList);
+
+        Vector3 direction = closestObject.position - transform.position;
+        direction.z = 0;
+        direction.Normalize();
+
+        inputList.Add(direction.x);
+        inputList.Add(direction.y);
+
+        return inputList;
+    }
+
+    void GetClosestEnemy(List<Transform> objects)
+    {
+        float minDistance = Mathf.Infinity;
+
+        foreach (Transform eachTransform in objects)
+        {
+            if(eachTransform.Equals(transform))
+            {
+                continue;
+            }
+
+            float distance = Vector2.Distance(eachTransform.transform.position, transform.position);
+
+            if(distance < minDistance)
+            {
+                minDistance = distance;
+                closestObject = eachTransform;
+            }
+
+        }
         
-    //}
+    }
 
 
     public void RestoreComponents()
     {
-        
-    }
-
-    void GetClosestEnemy(List<Transform> objects)
-    {       
         
     }
 
