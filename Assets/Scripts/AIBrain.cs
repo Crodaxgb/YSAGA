@@ -6,6 +6,8 @@ using System;
 
 public class AIBrain : MonoBehaviour
 {
+    public float speed = 5f;
+
     List<float> inputList;
 
     GameManager gmRef;
@@ -13,11 +15,13 @@ public class AIBrain : MonoBehaviour
     Rigidbody2D rigidBodyRef;
     Transform closestObject = null;
 
+    private float growthScale = 0.15f;
+
     void Awake()
     {
         inputList = new List<float>();
         neuralNetwork = new NeuralNetwork();
-        neuralNetwork.InitializeNetwork(new int[] { 2, 6, 2});
+        neuralNetwork.InitializeNetwork(new int[] { 2, 6, 5});
         rigidBodyRef = GetComponent<Rigidbody2D>();
     }
 
@@ -26,15 +30,27 @@ public class AIBrain : MonoBehaviour
     {
 
         var networkResponse = neuralNetwork.CalculateOutput(CreateInput());
-        rigidBodyRef.velocity = new Vector2(networkResponse.ElementAt(0), 
-            networkResponse.ElementAt(1));
+        Vector2 movementVector = new Vector2();
+        movementVector.x = networkResponse.ElementAt(0) - networkResponse.ElementAt(1);
+        movementVector.y = networkResponse.ElementAt(2) - networkResponse.ElementAt(3);
 
         Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
+
+        rigidBodyRef.velocity = movementVector * speed * networkResponse.ElementAt(4) / transform.localScale.x;
+        DontLeaveScene(false);
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {       
+        if(transform.localScale.x > collision.transform.localScale.x * 1.1f)
+        {
+            transform.localScale += collision.transform.localScale * growthScale;
+            //individual score++
+            collision.GetComponent<SpriteRenderer>().enabled = false;
+
+        }
+
     }
 
 
@@ -71,7 +87,7 @@ public class AIBrain : MonoBehaviour
                 minDistance = distance;
                 closestObject = eachTransform;
             }
-
+            
         }
         
     }
