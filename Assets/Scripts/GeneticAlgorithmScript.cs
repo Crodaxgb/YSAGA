@@ -48,10 +48,32 @@ public class GeneticAlgorithm
         }
 
     }
-    //List<float> GetChromoRoulettte()
-    //{        
-        
-    //}
+
+
+    List<float> GetChromoRoulettte()
+    {
+        float slice = Random.Range(0f, 1f) * totalFitness;
+        List<float> chosenOne = Population[0].weightList;
+        float fitnessSoFar = 0f;
+
+        if(totalFitness > 0)
+        {
+            for (int currentIndividual = 0; currentIndividual < populationSize; currentIndividual++)
+            {
+                fitnessSoFar += Population[currentIndividual].genomeFitness;
+
+                if(fitnessSoFar > slice)
+                {
+                    chosenOne = Population[currentIndividual].weightList;
+                    break;
+                }
+            }
+        }
+
+
+        return chosenOne;
+
+    }
 
     void CrossOver(ref List<float> mum, ref List<float> dad, ref List<float> baby1, ref List<float> baby2)
     {
@@ -88,14 +110,44 @@ public class GeneticAlgorithm
     //}
 
     //Elitisim için en iyi bireyin bulunmasý
-    void GrabNBest(int nBest, int numberOfCopies, ref List<(List<float> weightList, float genomeFitness)> populationReference)
+    void GrabNBest(int nBest, int numberOfCopies, ref List<(List<float> weightList, float genomeFitness)> newPopulationReference)
     {
+        while (nBest >= 0)
+        {
+            for (int bestIndIndex = 0; bestIndIndex < numberOfCopies; bestIndIndex++)
+            {
+
+            }
+
+            nBest--;
+        }
+
 
     }
 
     void CalculateBestWorstAvTot()
     {
-        
+        totalFitness = 0;
+        float highestSoFar = Mathf.NegativeInfinity;
+        float lowestSoFar= Mathf.Infinity;
+
+        for (int individualIndex = 0; individualIndex < populationSize; individualIndex++)
+        {
+            if(Population[individualIndex].genomeFitness > highestSoFar)
+            {
+                highestSoFar = Population[individualIndex].genomeFitness;
+                fittestGenome = individualIndex;
+                bestFitness = highestSoFar;
+            }
+
+            if (Population[individualIndex].genomeFitness < lowestSoFar)
+            {
+                lowestSoFar = Population[individualIndex].genomeFitness;
+                worstFitness = lowestSoFar;
+            }
+            totalFitness += Population[individualIndex].genomeFitness;
+
+        }
 
     }
 
