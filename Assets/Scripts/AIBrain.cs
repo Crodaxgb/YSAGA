@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class AIBrain : MonoBehaviour
+public class AIBrain : MonoBehaviour, Killable
 {
     public float speed = 5f;
 
@@ -15,7 +15,11 @@ public class AIBrain : MonoBehaviour
     Rigidbody2D rigidBodyRef;
     Transform closestObject = null;
 
-    private float growthScale = 0.15f;
+    [SerializeField]
+    private float deathPenalty = 10f;
+
+    private float growthScale = 0.15f, individualScore;
+    private bool isDead = false;
 
     void Awake()
     {
@@ -93,11 +97,6 @@ public class AIBrain : MonoBehaviour
     }
 
 
-    public void RestoreComponents()
-    {
-        
-    }
-
 
     private void DontLeaveScene(bool torus)
     {
@@ -109,7 +108,27 @@ public class AIBrain : MonoBehaviour
         return true;
     }
 
+    public void RestoreComponents()
+    {
+        IsDead = false;
+        GetComponent<SpriteRenderer>().enabled = true;
+        GetComponent<CircleCollider2D>().enabled = true;
+        transform.localScale = Vector3.one;
+
+    }
+
+    public void KillMessage()
+    {
+        IsDead = true;
+        GetComponent<SpriteRenderer>().enabled = false;
+        GetComponent<CircleCollider2D>().enabled = false;
+        transform.position = new Vector3(-25f, -25f, 0);
+        
+    }
+
     public GameManager GmRef { get => gmRef; set => gmRef = value; }
+    public bool IsDead { get => isDead; set => isDead = value; }
+    public float IndividualScore { get => individualScore; set => individualScore = value; }
 }
 
 public class NeuralNetwork
