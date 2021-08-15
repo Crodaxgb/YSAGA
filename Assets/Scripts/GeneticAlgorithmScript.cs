@@ -20,7 +20,6 @@ public class GeneticAlgorithm
     float mutationRate;
     float crossOverRate;
 
-
     public GeneticAlgorithm(int popSize, float mutationRate, float crossOverRate, int chromoLength)
     {
         this.populationSize = popSize;
@@ -31,15 +30,22 @@ public class GeneticAlgorithm
         totalFitness = 0;
         generCounter = 0;
         fittestGenome = 0;
-        bestFitness = 0;
-        averageFitness = 0;
+        BestFitness = 0;
+        AverageFitness = 0;
         worstFitness = Mathf.Infinity;
 
-        population = new List<(List<float> weightList, float genomeFitness)>();
+        Population = new List<(List<float> weightList, float genomeFitness)>();
     }
 
-    void Mutate(ref List<float> chromosome)
+    void Mutate(ref List<float> genome)
     {
+        for (int chromosomeIndex = 0; chromosomeIndex < genome.Count; chromosomeIndex++)
+        {
+            if(Random.Range(0f, 1f) < mutationRate)
+            {
+                genome[chromosomeIndex] += (Random.Range(-maxPerturbation, maxPerturbation));
+            }
+        }
 
     }
     //List<float> GetChromoRoulettte()
@@ -49,7 +55,29 @@ public class GeneticAlgorithm
 
     void CrossOver(ref List<float> mum, ref List<float> dad, ref List<float> baby1, ref List<float> baby2)
     {
-        
+        if((Random.Range(0f, 1f)) > crossOverRate || (mum.Equals(dad)))//cross over olmadýðý zaman
+        {
+            baby1 = mum;
+            baby2 = dad;            
+        }
+        else //crossover gerçekleþtiði zaman
+        {
+
+            int crossoverPoint = Random.Range(0, chromoLength - 1);
+
+            for (int beforePointIndex = 0; beforePointIndex < crossoverPoint; beforePointIndex++)
+            {
+                baby1.Add(mum[beforePointIndex]);
+                baby2.Add(dad[beforePointIndex]);
+            }
+
+            for (int afterPointIndex = crossoverPoint; afterPointIndex < mum.Count; afterPointIndex++)
+            {
+                baby1.Add(dad[afterPointIndex]);
+                baby2.Add(mum[afterPointIndex]);
+            }
+
+        }        
     }
 
 
@@ -71,13 +99,17 @@ public class GeneticAlgorithm
 
     }
 
-    //void Reset()
-    //{
-    //    totalFitness = 0;
-    //    bestFitness = 0;
-    //    worstFitness = 9999999;
-    //    averageFitness = 0;
-    //}
-  
+    void Reset()
+    {
+        totalFitness = 0;
+        BestFitness = 0;
+        worstFitness = Mathf.Infinity;
+        AverageFitness = 0;
+    }
+
+
+    public float BestFitness { get => bestFitness; set => bestFitness = value; }
+    public float AverageFitness { get => totalFitness / populationSize; set => averageFitness = value; }
+    public List<(List<float> weightList, float genomeFitness)> Population { get => population; set => population = value; }
 
 }
