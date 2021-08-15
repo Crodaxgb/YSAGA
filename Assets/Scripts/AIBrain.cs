@@ -25,33 +25,42 @@ public class AIBrain : MonoBehaviour, Killable
     {
         inputList = new List<float>();
         neuralNetwork = new NeuralNetwork();
-        neuralNetwork.InitializeNetwork(new int[] { 2, 6, 5});
+        neuralNetwork.InitializeNetwork(new int[] { 3, 6, 5});
         rigidBodyRef = GetComponent<Rigidbody2D>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(isDead)
+        {
+            rigidBodyRef.velocity = Vector3.zero;
+        }
+        else
+        {
+            var networkResponse = neuralNetwork.CalculateOutput(CreateInput());
+            Vector2 movementVector = new Vector2();
+            movementVector.x = networkResponse.ElementAt(0) - networkResponse.ElementAt(1);
+            movementVector.y = networkResponse.ElementAt(2) - networkResponse.ElementAt(3);
 
-        var networkResponse = neuralNetwork.CalculateOutput(CreateInput());
-        Vector2 movementVector = new Vector2();
-        movementVector.x = networkResponse.ElementAt(0) - networkResponse.ElementAt(1);
-        movementVector.y = networkResponse.ElementAt(2) - networkResponse.ElementAt(3);
+            Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
 
-        Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
+            rigidBodyRef.velocity = movementVector * speed * networkResponse.ElementAt(4) / transform.localScale.x;
+            DontLeaveScene(false);
 
-        rigidBodyRef.velocity = movementVector * speed * networkResponse.ElementAt(4) / transform.localScale.x;
-        DontLeaveScene(false);
+        }    
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {       
-        if(transform.localScale.x > collision.transform.localScale.x * 1.1f)
+        if(transform.localScale.x > collision.transform.localScale.x * 1.1f && collision.GetComponent<Killable>() != null)
         {
             transform.localScale += collision.transform.localScale * growthScale;
             //individual score++
             collision.GetComponent<SpriteRenderer>().enabled = false;
+            collision.GetComponent<Killable>().KillMessage();
 
         }
 
@@ -68,7 +77,9 @@ public class AIBrain : MonoBehaviour, Killable
         direction.Normalize();
 
         inputList.Add(direction.x);
-        inputList.Add(direction.y);
+        inputList.Add(direction.y);    
+        inputList.Add(closestObject.GetComponent<Killable>().IsEnemy() ? 1f : 0f );
+
 
         return inputList;
     }

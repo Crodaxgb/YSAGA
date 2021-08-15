@@ -20,7 +20,6 @@ public class FoodScript : MonoBehaviour, Killable
 
     public bool IsEnemy()
     {
-
         return false;
     }
 

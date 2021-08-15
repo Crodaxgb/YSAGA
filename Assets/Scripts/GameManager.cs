@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public GameObject aiPrefab, foodPrefab;
     public int aiCount, foodCount;
+    public float foodCheckPeriod = 5f;
 
     private (float xRange, float yRange) mapData = (23f, 10f);
 
@@ -24,7 +25,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        //StartCoroutine(CheckFoodCount());
+        StartCoroutine(CheckFoodCount());
     }
 
     /// <summary>
@@ -51,8 +52,18 @@ public class GameManager : MonoBehaviour
     {
         while(true)
         {
+            if((TransformList.Count - aiCount) < foodCount)
+            {
+                for (int foodIndex = 0; foodIndex < foodCount - (TransformList.Count - aiCount); foodIndex++)
+                {
+                    GameObject foodRef = InstantiateParameter(foodPrefab);
+                    TransformList.Add(foodRef.transform);
+                    foodRef.GetComponent<FoodScript>().GmRef = this;
+                }
+            }
 
-           
+
+            yield return new WaitForSeconds(foodCheckPeriod);
         }
     }
 
@@ -78,7 +89,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        Debug.Log(TransformList.Count);
     }
 
     private void RefreshText()
