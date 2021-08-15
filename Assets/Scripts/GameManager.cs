@@ -9,9 +9,10 @@ public class GameManager : MonoBehaviour
     public GameObject aiPrefab, foodPrefab;
     public int aiCount, foodCount;
     public float foodCheckPeriod = 5f;
+    public bool torus;
 
     private (float xRange, float yRange) mapData = (23f, 10f);
-
+    private float camOrthSize, screenRatio, widthOrtho;
     private List<Transform> transformList;
 
     
@@ -19,7 +20,11 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         TransformList = new List<Transform>();
-        InstantiateSceneObjects();    
+        InstantiateSceneObjects();
+
+        camOrthSize = Camera.main.orthographicSize;
+        screenRatio = (float)Screen.width / (float)Screen.height;
+        widthOrtho = camOrthSize * screenRatio;
        
     }
 
@@ -89,7 +94,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(TransformList.Count);
     }
 
     private void RefreshText()
@@ -113,4 +117,7 @@ public class GameManager : MonoBehaviour
     }
 
     public List<Transform> TransformList { get => transformList; set => transformList = value; }
+    public float CamOrthSize { get => camOrthSize; set => camOrthSize = value; }
+    public float ScreenRatio { get => screenRatio; set => screenRatio = value; }
+    public float WidthOrtho { get => widthOrtho; set => widthOrtho = value; }
 }

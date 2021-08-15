@@ -340,6 +340,7 @@ MonoBehaviour:
   foodPrefab: {fileID: 1400098214406659450, guid: 33064b08c3a9857479a7c09c24435418, type: 3}
   aiCount: 30
   foodCount: 200
+  foodCheckPeriod: 5
 --- !u!4 &594706851
 Transform:
   m_ObjectHideFlags: 0

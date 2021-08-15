@@ -19,8 +19,9 @@ public class AIBrain : MonoBehaviour, Killable
     private float deathPenalty = 10f;
 
     private float growthScale = 0.15f, individualScore;
-    private bool isDead = false;
-
+    private bool isDead = false, torus;
+    private float yMAx, xMax, boundaryRadius = 1.5f;
+    
     void Awake()
     {
         inputList = new List<float>();
@@ -28,6 +29,13 @@ public class AIBrain : MonoBehaviour, Killable
         neuralNetwork.InitializeNetwork(new int[] { 3, 6, 5});
         rigidBodyRef = GetComponent<Rigidbody2D>();
 
+    }
+
+    void Start()
+    {
+        yMAx = GmRef.CamOrthSize;
+        xMax = GmRef.WidthOrtho;
+        Torus = GmRef.torus;
     }
 
     // Update is called once per frame
@@ -47,7 +55,7 @@ public class AIBrain : MonoBehaviour, Killable
             Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
 
             rigidBodyRef.velocity = movementVector * speed * networkResponse.ElementAt(4) / transform.localScale.x;
-            DontLeaveScene(false);
+            DontLeaveScene(torus:Torus);
 
         }    
 
@@ -111,7 +119,50 @@ public class AIBrain : MonoBehaviour, Killable
 
     private void DontLeaveScene(bool torus)
     {
-        
+        var calculatedPosition = transform.position;
+
+        if(torus)
+        {
+            if(transform.position.y + boundaryRadius > yMAx)
+            {
+                calculatedPosition.y = -yMAx + boundaryRadius;
+            }
+            if(transform.position.y - boundaryRadius < - yMAx)
+            {
+                calculatedPosition.y = yMAx - boundaryRadius;
+            }
+            if(transform.position.x + boundaryRadius > xMax)
+            {
+                calculatedPosition.x = -xMax + boundaryRadius;
+            }
+            if (transform.position.x - boundaryRadius < -xMax)
+            {
+                calculatedPosition.x = xMax - boundaryRadius;
+            }
+        }
+        else
+        {
+            if (transform.position.y + boundaryRadius > yMAx)
+            {
+                calculatedPosition.y = yMAx - boundaryRadius;
+            }
+            if (transform.position.y - boundaryRadius < -yMAx)
+            {
+                calculatedPosition.y = -yMAx + boundaryRadius;
+            }
+            if (transform.position.x + boundaryRadius > xMax)
+            {
+                calculatedPosition.x = xMax - boundaryRadius;
+            }
+            if (transform.position.x - boundaryRadius < -xMax)
+            {
+                calculatedPosition.x = -xMax + boundaryRadius;
+            }
+
+        }
+
+        transform.position = calculatedPosition;
+
     }
 
     public bool IsEnemy()
@@ -140,6 +191,7 @@ public class AIBrain : MonoBehaviour, Killable
     public GameManager GmRef { get => gmRef; set => gmRef = value; }
     public bool IsDead { get => isDead; set => isDead = value; }
     public float IndividualScore { get => individualScore; set => individualScore = value; }
+    public bool Torus { get => torus; set => torus = value; }
 }
 
 public class NeuralNetwork
