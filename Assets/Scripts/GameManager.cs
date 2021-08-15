@@ -15,8 +15,15 @@ public class GameManager : MonoBehaviour
     private float camOrthSize, screenRatio, widthOrtho;
     private List<Transform> transformList;
 
-    
+    [Space]
+    [Space]
+    [Header("Genetic Algorithm")]
+    public float crossOverRatio;
+    public float mutationRatio;
 
+    private GeneticAlgorithm geneticAlgorithm;
+
+    
     void Awake()
     {
         TransformList = new List<Transform>();
@@ -25,14 +32,14 @@ public class GameManager : MonoBehaviour
         camOrthSize = Camera.main.orthographicSize;
         screenRatio = (float)Screen.width / (float)Screen.height;
         widthOrtho = camOrthSize * screenRatio;
-       
+        geneticAlgorithm = new GeneticAlgorithm(aiCount, mutationRatio, crossOverRatio, transformList[0].GetComponent<AIBrain>().NeuralNetwork.NeuralWeightLength);
     }
 
     private void Start()
     {
         StartCoroutine(CheckFoodCount());
     }
-
+    
     /// <summary>
     /// 
     /// </summary>

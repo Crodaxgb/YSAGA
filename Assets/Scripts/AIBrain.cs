@@ -25,8 +25,8 @@ public class AIBrain : MonoBehaviour, Killable
     void Awake()
     {
         inputList = new List<float>();
-        neuralNetwork = new NeuralNetwork();
-        neuralNetwork.InitializeNetwork(new int[] { 3, 6, 5});
+        NeuralNetwork = new NeuralNetwork();
+        NeuralNetwork.InitializeNetwork(new int[] { 3, 6, 5});
         rigidBodyRef = GetComponent<Rigidbody2D>();
 
     }
@@ -47,7 +47,7 @@ public class AIBrain : MonoBehaviour, Killable
         }
         else
         {
-            var networkResponse = neuralNetwork.CalculateOutput(CreateInput());
+            var networkResponse = NeuralNetwork.CalculateOutput(CreateInput());
             Vector2 movementVector = new Vector2();
             movementVector.x = networkResponse.ElementAt(0) - networkResponse.ElementAt(1);
             movementVector.y = networkResponse.ElementAt(2) - networkResponse.ElementAt(3);
@@ -66,8 +66,7 @@ public class AIBrain : MonoBehaviour, Killable
         if(transform.localScale.x > collision.transform.localScale.x * 1.1f && collision.GetComponent<Killable>() != null)
         {
             transform.localScale += collision.transform.localScale * growthScale;
-            //individual score++
-            collision.GetComponent<SpriteRenderer>().enabled = false;
+            individualScore += collision.transform.localScale.x;         
             collision.GetComponent<Killable>().KillMessage();
 
         }
@@ -125,19 +124,19 @@ public class AIBrain : MonoBehaviour, Killable
         {
             if(transform.position.y + boundaryRadius > yMAx)
             {
-                calculatedPosition.y = -yMAx + boundaryRadius;
+                calculatedPosition.y = -yMAx + boundaryRadius * 1.5f;
             }
             if(transform.position.y - boundaryRadius < - yMAx)
             {
-                calculatedPosition.y = yMAx - boundaryRadius;
+                calculatedPosition.y = yMAx - boundaryRadius * 1.5f;
             }
             if(transform.position.x + boundaryRadius > xMax)
             {
-                calculatedPosition.x = -xMax + boundaryRadius;
+                calculatedPosition.x = -xMax + boundaryRadius * 1.5f;
             }
             if (transform.position.x - boundaryRadius < -xMax)
             {
-                calculatedPosition.x = xMax - boundaryRadius;
+                calculatedPosition.x = xMax - boundaryRadius * 1.5f;
             }
         }
         else
@@ -192,6 +191,7 @@ public class AIBrain : MonoBehaviour, Killable
     public bool IsDead { get => isDead; set => isDead = value; }
     public float IndividualScore { get => individualScore; set => individualScore = value; }
     public bool Torus { get => torus; set => torus = value; }
+    public NeuralNetwork NeuralNetwork { get => neuralNetwork; set => neuralNetwork = value; }
 }
 
 public class NeuralNetwork

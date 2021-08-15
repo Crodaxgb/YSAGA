@@ -4,10 +4,38 @@ using UnityEngine;
 
 public class GeneticAlgorithm
 {
+    List<(List<float> weightList, float genomeFitness)>  population;
+    int populationSize;
+    int chromoLength;
+    int fittestGenome;
+    int generCounter;
+    int NumElite = 4;
+    int NumOfCopiesElite = 2;
+    float maxPerturbation = 0.3f;
+    float totalFitness;
+    float bestFitness;
+    float worstFitness;
+    float averageFitness;
+
+    float mutationRate;
+    float crossOverRate;
+
 
     public GeneticAlgorithm(int popSize, float mutationRate, float crossOverRate, int chromoLength)
     {
-        
+        this.populationSize = popSize;
+        this.mutationRate = mutationRate;
+        this.crossOverRate = crossOverRate;
+        this.chromoLength = chromoLength;
+
+        totalFitness = 0;
+        generCounter = 0;
+        fittestGenome = 0;
+        bestFitness = 0;
+        averageFitness = 0;
+        worstFitness = Mathf.Infinity;
+
+        population = new List<(List<float> weightList, float genomeFitness)>();
     }
 
     void Mutate(ref List<float> chromosome)
