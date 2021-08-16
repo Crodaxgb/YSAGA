@@ -146,7 +146,7 @@ public class GeneticAlgorithm
         {
             for (int bestIndIndex = 0; bestIndIndex < numberOfCopies; bestIndIndex++)
             {
-                newPopulationReference.Add(Population[nBest]);
+                newPopulationReference.Add((Population[nBest].weightList, 0.0f));
             }
 
             nBest--;

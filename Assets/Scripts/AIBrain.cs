@@ -20,7 +20,7 @@ public class AIBrain : MonoBehaviour, Killable
 
     private float growthScale = 0.15f, individualScore;
     private bool isDead = false, torus;
-    private float yMAx, xMax, boundaryRadius = 1.5f;
+    private float yMAx, xMax, boundaryRadius = 0.5f;
     
     void Awake()
     {

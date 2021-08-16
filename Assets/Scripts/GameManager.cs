@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviour
             epochTime = epochBackUp;
             DeployGeneticAlgorithm();
             RefreshLevel();
-            epochTime++;
+            epochCount++;
         }
 
         epochTime -= Time.deltaTime;
@@ -131,13 +131,31 @@ public class GameManager : MonoBehaviour
 
     void DeployGeneticAlgorithm()
     {
-        
+        var currentPopulation = GetPopulation();
+
+        var newPopulation = geneticAlgorithm.Epoch(ref currentPopulation);
+
+        for (int individualIndex = 0; individualIndex < aiCount; individualIndex++)
+        {
+            var currentIndividual = TransformList[individualIndex].GetComponent<AIBrain>();
+            currentIndividual.NeuralNetwork.PutWeights(newPopulation[individualIndex].weightList);
+            //currentIndividual.IndividualScore = newPopulation[individualIndex].genomeFitness;
+            currentIndividual.IndividualScore = 0;
+        }
     }
 
-    //List<(List<float> weightList, float fitness)> GetPopulation()
-    //{
-       
-    //}
+    List<(List<float> weightList, float fitness)> GetPopulation()
+    {
+        List<(List<float> weightList, float fitness)> currentPopulation = new List<(List<float> weightList, float fitness)>();
+
+        for (int individualIndex = 0; individualIndex < aiCount; individualIndex++)
+        {
+            var currentIndividual = TransformList[individualIndex].GetComponent<AIBrain>();
+            currentPopulation.Add((currentIndividual.NeuralNetwork.GetWeights(), currentIndividual.IndividualScore));
+        }
+
+        return currentPopulation;
+    }
 
     public void SpeedUpButton()
     {
