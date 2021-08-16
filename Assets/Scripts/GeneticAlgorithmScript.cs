@@ -103,11 +103,41 @@ public class GeneticAlgorithm
     }
 
 
-    //public List<(List<float> weightList, float genomeFitness)> Epoch(ref List<(List<float> weightList, float genomeFitness)> oldPopulation)
-    //{
+    public List<(List<float> weightList, float genomeFitness)> Epoch(ref List<(List<float> weightList, float genomeFitness)> oldPopulation)
+    {
+        Population = oldPopulation;
+        Reset();
 
+        oldPopulation.Sort((x, y)=> y.genomeFitness.CompareTo(x.genomeFitness));
 
-    //}
+        CalculateBestWorstAvTot();
+
+        List<(List<float> weightList, float genomeFitness)> newPopulation = new List<(List<float> weightList, float genomeFitness)>();
+
+        if(NumOfCopiesElite * NumElite % 2 == 0)
+        {
+            GrabNBest(NumElite, NumOfCopiesElite, ref newPopulation);
+        }
+
+        while (newPopulation.Count < populationSize)
+        {
+            List<float> mum = GetChromoRoulettte();
+            List<float> dad = GetChromoRoulettte();
+            List<float> baby1 = new List<float>();
+            List<float> baby2 = new List<float>();
+
+            CrossOver(ref mum, ref dad, ref baby1, ref baby2);
+
+            Mutate(ref baby1);
+            Mutate(ref baby2);
+
+            newPopulation.Add((baby1, 0.0f));
+            newPopulation.Add((baby2, 0.0f));
+        }
+
+        return newPopulation;
+
+    }
 
     //Elitisim için en iyi bireyin bulunmasý
     void GrabNBest(int nBest, int numberOfCopies, ref List<(List<float> weightList, float genomeFitness)> newPopulationReference)
@@ -116,12 +146,11 @@ public class GeneticAlgorithm
         {
             for (int bestIndIndex = 0; bestIndIndex < numberOfCopies; bestIndIndex++)
             {
-
+                newPopulationReference.Add(Population[nBest]);
             }
 
             nBest--;
         }
-
 
     }
 
@@ -155,7 +184,7 @@ public class GeneticAlgorithm
     {
         totalFitness = 0;
         BestFitness = 0;
-        worstFitness = Mathf.Infinity;
+        worstFitness = 0;
         AverageFitness = 0;
     }
 
