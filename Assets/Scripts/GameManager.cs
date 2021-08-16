@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public GameObject aiPrefab, foodPrefab;
+    public Text gaStatistics;
+    public Button speedUpButton;
     public int aiCount, foodCount;
     public float foodCheckPeriod = 5f;
     public bool torus;
@@ -20,12 +22,15 @@ public class GameManager : MonoBehaviour
     [Header("Genetic Algorithm")]
     public float crossOverRatio;
     public float mutationRatio;
+    public float epochTime;
 
+    private float epochBackUp;
     private GeneticAlgorithm geneticAlgorithm;
-
+    private int epochCount = 1;
     
     void Awake()
     {
+        epochBackUp = epochTime;
         TransformList = new List<Transform>();
         InstantiateSceneObjects();
 
@@ -40,9 +45,6 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CheckFoodCount());
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
     void InstantiateSceneObjects()
     {
         for (int aiIndex = 0; aiIndex < aiCount; aiIndex++)
@@ -91,21 +93,40 @@ public class GameManager : MonoBehaviour
         tempObject.GetComponent<SpriteRenderer>().color 
             = new Color(Random.Range(0f,1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
         return tempObject;
-    }
-
-    void RefreshLevel()
-    {
-
-    }
+    }  
 
     // Update is called once per frame
     void Update()
     {
+        if(epochTime <= 0)
+        {
+            epochTime = epochBackUp;
+            DeployGeneticAlgorithm();
+            RefreshLevel();
+            epochTime++;
+        }
+
+        epochTime -= Time.deltaTime;
+        RefreshText();
+    }
+
+    void RefreshLevel()
+    {
+        for (int aiIndex = 0; aiIndex < aiCount; aiIndex++)
+        {
+            TransformList.ElementAt(aiIndex).gameObject.GetComponent<AIBrain>().RestoreComponents();
+            TransformList.ElementAt(aiIndex).transform.position =
+            new Vector3
+                    (Random.Range(-1 * mapData.xRange, mapData.xRange),
+                    Random.Range(-1 * mapData.yRange, mapData.yRange),
+                    0);
+
+        }
     }
 
     private void RefreshText()
     {
-        
+        gaStatistics.text = $"Epoch Time: {epochTime}\nEpoch Count: {epochCount}\nBest Fitness: {geneticAlgorithm.BestFitness}";
     }
 
     void DeployGeneticAlgorithm()
@@ -120,7 +141,18 @@ public class GameManager : MonoBehaviour
 
     public void SpeedUpButton()
     {
-        
+        if(Time.timeScale == 1f)
+        {
+            Time.timeScale = 10f;
+            speedUpButton.GetComponentInChildren<Text>().text = "Normal Speed";
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            speedUpButton.GetComponentInChildren<Text>().text = "Speed Up";
+
+        }
+
     }
 
     public List<Transform> TransformList { get => transformList; set => transformList = value; }

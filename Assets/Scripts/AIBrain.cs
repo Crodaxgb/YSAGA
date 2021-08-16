@@ -175,7 +175,6 @@ public class AIBrain : MonoBehaviour, Killable
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<CircleCollider2D>().enabled = true;
         transform.localScale = Vector3.one;
-
     }
 
     public void KillMessage()
