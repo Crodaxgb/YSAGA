@@ -20,20 +20,20 @@ public class AIBrain : MonoBehaviour, Killable
 
     private float growthScale = 0.15f, individualScore;
     private bool isDead = false, torus;
-    private float yMAx, xMax, boundaryRadius = 0.5f;
+    private float yMax, xMax, boundaryRadius = 0.5f;
     
     void Awake()
     {
         inputList = new List<float>();
         NeuralNetwork = new NeuralNetwork();
-        NeuralNetwork.InitializeNetwork(new int[] { 3, 6, 5});
+        NeuralNetwork.InitializeNetwork(new int[] { 2, 6, 5});
         rigidBodyRef = GetComponent<Rigidbody2D>();
 
     }
 
     void Start()
     {
-        yMAx = GmRef.CamOrthSize;
+        yMax = GmRef.CamOrthSize;
         xMax = GmRef.WidthOrtho;
         Torus = GmRef.torus;
     }
@@ -56,20 +56,49 @@ public class AIBrain : MonoBehaviour, Killable
 
             rigidBodyRef.velocity = movementVector * speed * networkResponse.ElementAt(4) / transform.localScale.x;
             DontLeaveScene(torus:Torus);
-
+            ScoreTesting();
         }    
+
+    }
+
+    void ScoreTesting()
+    {
+        float yPosNorm = (transform.position.y + yMax) / (2 * yMax);
+        float xPosNorm = (transform.position.x + xMax) / (2 * xMax);
+
+        if(yPosNorm > 0.40f && yPosNorm < 0.60f && !IsDead)
+        {
+            IndividualScore += Time.deltaTime * 2.5f;
+        }
+        else
+        {
+            IndividualScore -= Time.deltaTime * 2.5f;
+
+        }
+
+        if (xPosNorm > 0.40f && xPosNorm < 0.60f && !IsDead)
+        {
+            IndividualScore += Time.deltaTime * 2.5f;
+        }
+        else
+        {
+            IndividualScore -= Time.deltaTime * 2.5f;
+
+        }
+
+
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {       
-        if(transform.localScale.x > collision.transform.localScale.x * 1.1f && collision.GetComponent<Killable>() != null)
-        {
-            transform.localScale += collision.transform.localScale * growthScale;
-            individualScore += collision.transform.localScale.x;         
-            collision.GetComponent<Killable>().KillMessage();
+        //if(transform.localScale.x > collision.transform.localScale.x * 1.1f && collision.GetComponent<Killable>() != null)
+        //{
+        //    transform.localScale += collision.transform.localScale * growthScale;
+        //    individualScore += collision.transform.localScale.x;         
+        //    collision.GetComponent<Killable>().KillMessage();
 
-        }
+        //}
 
     }
 
@@ -79,14 +108,16 @@ public class AIBrain : MonoBehaviour, Killable
         inputList.Clear();
         GetClosestEnemy(GmRef.TransformList);
 
-        Vector3 direction = closestObject.position - transform.position;
-        direction.z = 0;
-        direction.Normalize();
+        //Vector3 direction = closestObject.position - transform.position;
+        //direction.z = 0;
+        //direction.Normalize();
 
-        inputList.Add(direction.x);
-        inputList.Add(direction.y);    
-        inputList.Add(closestObject.GetComponent<Killable>().IsEnemy() ? 1f : 0f );
+        //inputList.Add(direction.x);
+        //inputList.Add(direction.y);    
+        //inputList.Add(closestObject.GetComponent<Killable>().IsEnemy() ? 1f : 0f );
 
+        inputList.Add((transform.position.y + yMax) / (2 * yMax));
+        inputList.Add((transform.position.x + xMax) / (2 * xMax));
 
         return inputList;
     }
@@ -122,13 +153,13 @@ public class AIBrain : MonoBehaviour, Killable
 
         if(torus)
         {
-            if(transform.position.y + boundaryRadius > yMAx)
+            if(transform.position.y + boundaryRadius > yMax)
             {
-                calculatedPosition.y = -yMAx + boundaryRadius * 1.5f;
+                calculatedPosition.y = -yMax + boundaryRadius * 1.5f;
             }
-            if(transform.position.y - boundaryRadius < - yMAx)
+            if(transform.position.y - boundaryRadius < - yMax)
             {
-                calculatedPosition.y = yMAx - boundaryRadius * 1.5f;
+                calculatedPosition.y = yMax - boundaryRadius * 1.5f;
             }
             if(transform.position.x + boundaryRadius > xMax)
             {
@@ -141,13 +172,13 @@ public class AIBrain : MonoBehaviour, Killable
         }
         else
         {
-            if (transform.position.y + boundaryRadius > yMAx)
+            if (transform.position.y + boundaryRadius > yMax)
             {
-                calculatedPosition.y = yMAx - boundaryRadius;
+                calculatedPosition.y = yMax - boundaryRadius;
             }
-            if (transform.position.y - boundaryRadius < -yMAx)
+            if (transform.position.y - boundaryRadius < -yMax)
             {
-                calculatedPosition.y = -yMAx + boundaryRadius;
+                calculatedPosition.y = -yMax + boundaryRadius;
             }
             if (transform.position.x + boundaryRadius > xMax)
             {
@@ -179,10 +210,10 @@ public class AIBrain : MonoBehaviour, Killable
 
     public void KillMessage()
     {
-        IsDead = true;
-        GetComponent<SpriteRenderer>().enabled = false;
-        GetComponent<CircleCollider2D>().enabled = false;
-        transform.position = new Vector3(-25f, -25f, 0);
+        //IsDead = true;
+        //GetComponent<SpriteRenderer>().enabled = false;
+        //GetComponent<CircleCollider2D>().enabled = false;
+        //transform.position = new Vector3(-25f, -25f, 0);
         
     }
 
@@ -211,6 +242,7 @@ public class NeuralNetwork
             {
                 for (int columnIndex = 0; columnIndex < layers[layerIndex] + 1; columnIndex++)
                 {
+                    //layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(0f, 1f);
                     layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(0f, 1f);
                     NeuralWeightLength++;
                 }
@@ -277,7 +309,9 @@ public class NeuralNetwork
                 }
                 //bias
                 weightedSum -= weights.ElementAt(layerIndex)[rowIndex, neuralLayers[layerIndex]];
-                outputs.Add(Sigmoid(weightedSum));
+                //outputs.Add(Sigmoid(weightedSum));
+                outputs.Add((float)Math.Tanh((double)weightedSum));
+
             }
 
             inputs = outputs;

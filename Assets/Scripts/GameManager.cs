@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public float foodCheckPeriod = 5f;
     public bool torus;
 
-    private (float xRange, float yRange) mapData = (23f, 10f);
+    private (float xRange, float yRange) mapData;
     private float camOrthSize, screenRatio, widthOrtho;
     private List<Transform> transformList;
 
@@ -30,13 +30,16 @@ public class GameManager : MonoBehaviour
     
     void Awake()
     {
+        Application.runInBackground = true;
         epochBackUp = epochTime;
-        TransformList = new List<Transform>();
-        InstantiateSceneObjects();
-
         camOrthSize = Camera.main.orthographicSize;
         screenRatio = (float)Screen.width / (float)Screen.height;
         widthOrtho = camOrthSize * screenRatio;
+        mapData = (widthOrtho, camOrthSize);
+
+        TransformList = new List<Transform>();
+        InstantiateSceneObjects();
+        
         geneticAlgorithm = new GeneticAlgorithm(aiCount, mutationRatio, crossOverRatio, transformList[0].GetComponent<AIBrain>().NeuralNetwork.NeuralWeightLength);
     }
 
