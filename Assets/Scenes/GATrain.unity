@@ -343,10 +343,10 @@ MonoBehaviour:
   aiCount: 30
   foodCount: 500
   foodCheckPeriod: 0.5
-  torus: 0
-  crossOverRatio: 0.3
-  mutationRatio: 0.1
-  epochTime: 20
+  torus: 1
+  crossOverRatio: 0.6
+  mutationRatio: 0.2
+  epochTime: 30
 --- !u!4 &594706851
 Transform:
   m_ObjectHideFlags: 0

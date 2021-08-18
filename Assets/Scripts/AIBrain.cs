@@ -20,13 +20,13 @@ public class AIBrain : MonoBehaviour, Killable
 
     private float growthScale = 0.15f, individualScore;
     private bool isDead = false, torus;
-    private float yMax, xMax, boundaryRadius = 0.5f;
+    private float yMax, xMax, boundaryRadius = 0.5f, enemyClosenessPenalty = 5f, screenPenalty = 10f;
     
     void Awake()
     {
         inputList = new List<float>();
         NeuralNetwork = new NeuralNetwork();
-        NeuralNetwork.InitializeNetwork(new int[] { 2, 6, 5});
+        NeuralNetwork.InitializeNetwork(new int[] { 7, 16, 5});
         rigidBodyRef = GetComponent<Rigidbody2D>();
 
     }
@@ -52,11 +52,22 @@ public class AIBrain : MonoBehaviour, Killable
             movementVector.x = networkResponse.ElementAt(0) - networkResponse.ElementAt(1);
             movementVector.y = networkResponse.ElementAt(2) - networkResponse.ElementAt(3);
 
-            Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
+            if (closestObject.GetComponent<Killable>().IsEnemy() 
+                && transform.localScale.x * 1.1f < closestObject.localScale.x
+                && Vector2.Distance(closestObject.transform.position, transform.position) < 5f)
+            {
+                IndividualScore -= enemyClosenessPenalty * Time.deltaTime;
+                Debug.DrawLine(transform.position, closestObject.transform.position, Color.blue);
+            }
+            else
+            {
+                Debug.DrawLine(transform.position, closestObject.transform.position, Color.red);
+            }
+
 
             rigidBodyRef.velocity = movementVector * speed * networkResponse.ElementAt(4) / transform.localScale.x;
             DontLeaveScene(torus:Torus);
-            ScoreTesting();
+            //ScoreTesting();
         }    
 
     }
@@ -91,14 +102,14 @@ public class AIBrain : MonoBehaviour, Killable
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
-    {       
-        //if(transform.localScale.x > collision.transform.localScale.x * 1.1f && collision.GetComponent<Killable>() != null)
-        //{
-        //    transform.localScale += collision.transform.localScale * growthScale;
-        //    individualScore += collision.transform.localScale.x;         
-        //    collision.GetComponent<Killable>().KillMessage();
+    {
+        if (transform.localScale.x > collision.transform.localScale.x * 1.1f && collision.GetComponent<Killable>() != null)
+        {
+            transform.localScale += collision.transform.localScale * growthScale;
+            individualScore += collision.transform.localScale.x;
+            collision.GetComponent<Killable>().KillMessage();
 
-        //}
+        }
 
     }
 
@@ -108,16 +119,25 @@ public class AIBrain : MonoBehaviour, Killable
         inputList.Clear();
         GetClosestEnemy(GmRef.TransformList);
 
-        //Vector3 direction = closestObject.position - transform.position;
-        //direction.z = 0;
-        //direction.Normalize();
+        Vector3 direction = closestObject.position - transform.position;
+        direction.z = 0;
+        direction.Normalize();
 
-        //inputList.Add(direction.x);
-        //inputList.Add(direction.y);    
-        //inputList.Add(closestObject.GetComponent<Killable>().IsEnemy() ? 1f : 0f );
+        Vector3 rigidVelocity = rigidBodyRef.velocity.normalized;
 
-        inputList.Add((transform.position.y + yMax) / (2 * yMax));
-        inputList.Add((transform.position.x + xMax) / (2 * xMax));
+        inputList.Add(direction.x);
+        inputList.Add(direction.y); 
+        inputList.Add(rigidVelocity.x);
+        inputList.Add(rigidVelocity.y);
+        inputList.Add(closestObject.localScale.x * 1.1f > transform.localScale.x ? 1f: 0f);
+        inputList.Add(closestObject.GetComponent<Killable>().IsEnemy() ? 1f : 0f);
+        inputList.Add(Mathf.Clamp(Vector2.Distance(closestObject.transform.position, transform.position) / 5f, 0f, 1f));
+
+        //inputList.Add((transform.position.y + yMax) / (2 * yMax));
+        //inputList.Add((transform.position.x + xMax) / (2 * xMax));
+        //inputList.Add((closestObject.transform.position.y + yMax) / (2 * yMax));
+        //inputList.Add((closestObject.transform.position.x + xMax) / (2 * xMax));
+      
 
         return inputList;
     }
@@ -175,18 +195,22 @@ public class AIBrain : MonoBehaviour, Killable
             if (transform.position.y + boundaryRadius > yMax)
             {
                 calculatedPosition.y = yMax - boundaryRadius;
+                IndividualScore -= screenPenalty * Time.deltaTime;
             }
             if (transform.position.y - boundaryRadius < -yMax)
             {
                 calculatedPosition.y = -yMax + boundaryRadius;
+                IndividualScore -= screenPenalty * Time.deltaTime;
             }
             if (transform.position.x + boundaryRadius > xMax)
             {
                 calculatedPosition.x = xMax - boundaryRadius;
+                IndividualScore -= screenPenalty * Time.deltaTime;
             }
             if (transform.position.x - boundaryRadius < -xMax)
             {
                 calculatedPosition.x = -xMax + boundaryRadius;
+                IndividualScore -= screenPenalty * Time.deltaTime;
             }
 
         }
@@ -210,11 +234,11 @@ public class AIBrain : MonoBehaviour, Killable
 
     public void KillMessage()
     {
-        //IsDead = true;
-        //GetComponent<SpriteRenderer>().enabled = false;
-        //GetComponent<CircleCollider2D>().enabled = false;
-        //transform.position = new Vector3(-25f, -25f, 0);
-        
+        IsDead = true;
+        GetComponent<SpriteRenderer>().enabled = false;
+        GetComponent<CircleCollider2D>().enabled = false;
+        transform.position = new Vector3(-25f, -25f, 0);
+
     }
 
     public GameManager GmRef { get => gmRef; set => gmRef = value; }
@@ -243,7 +267,7 @@ public class NeuralNetwork
                 for (int columnIndex = 0; columnIndex < layers[layerIndex] + 1; columnIndex++)
                 {
                     //layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(0f, 1f);
-                    layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(0f, 1f);
+                    layerWeights[rowIndex, columnIndex] = UnityEngine.Random.Range(-1f, 1f);
                     NeuralWeightLength++;
                 }
 

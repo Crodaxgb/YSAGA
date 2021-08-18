@@ -69,6 +69,15 @@ public class GeneticAlgorithm
                 }
             }
         }
+        else
+        {
+            chosenOne.Clear();
+
+            for (int chosenOneIndex = 0; chosenOneIndex < chromoLength; chosenOneIndex++)
+            {
+                chosenOne.Add(Random.Range(-1f, 1f));
+            }
+        }
 
 
         return chosenOne;
